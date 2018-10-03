@@ -73,6 +73,16 @@ export default class App extends React.Component {
       setTimeout(() => this.map.animateToRegion(region), 10);
     }
   }
+
+  componentWillMount(){
+    this.state.markers.push({
+      title:'Wow',
+      coordinates:{
+        latitude: 51.457890,
+        longitude: -0.975700
+      }
+    });
+  }
   
   componentDidMount(){
     this.getCurrentPosition();
@@ -85,9 +95,7 @@ export default class App extends React.Component {
 
     if(region.longitudeDelta > 0.03 && region.latitudeDelta > 0.03 ){
       console.log("should have done it");
-      return (
-        this.state.markers = []
-      );
+      //this.state.markers=[]
   }
 }
 
