@@ -2,7 +2,17 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import MapView from 'react-native-maps';
 import { Marker } from 'react-native-maps';
+import * as firebase from "firebase";
 //import Camera from 'react-native-camera';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAaQnRN6FDgLJzdzRQTSybZLyqVsQ2TTNQ",
+  authDomain: "picdrop-4f5a3.firebaseapp.com",
+  databaseURL: "https://picdrop-4f5a3.firebaseio.com",
+  storageBucket: ""
+};
+const firebaseApp = firebase.initializeApp(firebaseConfig);
+
 
 const LATITUDE_DELTA = 0.01;
 const LONGITUDE_DELTA = 0.01;
@@ -31,6 +41,7 @@ export default class App extends React.Component {
 
   constructor(props) {
     super(props);
+    this.markersRef = firebaseApp.database().ref();
 
     this.state = {
       ready: true,
@@ -68,6 +79,12 @@ export default class App extends React.Component {
     
   }
 
+  readUserData() {
+    firebase.database().ref('Markers/').once('value', function (snapshot) {
+        console.log("Here it is : " + snapshot.child().val())
+    });
+  }
+
   setRegion(region){
     if(this.state.ready) {
       setTimeout(() => this.map.animateToRegion(region), 10);
@@ -86,15 +103,16 @@ export default class App extends React.Component {
   
   componentDidMount(){
     this.getCurrentPosition();
+    this.readUserData();
   }
 
   onRegionChange(region){
-    console.log("Region Changed , updated");
-    console.log(region.latitudeDelta);
-    console.log(region.longitudeDelta);
+    //console.log("Region Changed , updated");
+    //console.log(region.latitudeDelta);
+    //console.log(region.longitudeDelta);
 
     if(region.longitudeDelta > 0.03 && region.latitudeDelta > 0.03 ){
-      console.log("should have done it");
+      //console.log("should have done it");
       //this.state.markers=[]
   }
 }
