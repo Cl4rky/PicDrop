@@ -40,8 +40,9 @@ export default class App extends React.Component {
         latitudeDelta: 0.0922,
         longitudeDelta: 0.0421,
       },
+      dave: true,
       markers: [
-      {
+        {
         title: 'hello',
         coordinates: {
           latitude: 51.354837, 
@@ -49,49 +50,57 @@ export default class App extends React.Component {
         },
       },
       {
-        title: 'hello',
+        title: 'hello2',
         coordinates: {
           latitude: 51.355329,
           longitude: -0.777387
         },  
       }],
-    };
-      
+    }
   }
 
-  takePicture() {
-       this.camera.capture()
+  takePicture() { 
+     this.camera.capture()
     
-          .then((data) => console.log(data))
-    
-          .catch(err => console.error(err));
-    
+      .then((data) => console.log(data))
+      .catch(err => console.error(err));   
   }
 
   setRegion(region){
     if(this.state.ready) {
       setTimeout(() => this.map.animateToRegion(region), 10);
+      console.log("err okay");
     }
   }
   
   componentDidMount(){
+    // this.setState({
+    //   markers : [{
+    //     coordinates: {
+    //           latitude: 51.354837, 
+    //           longitude: -0.780931
+    //         },
+    //       }],
+    // })
     this.getCurrentPosition();
   }
 
   onRegionChange(region){
-    console.log("Region Changed , updated");
+    console.log("Region Changed");
     console.log(region.latitudeDelta);
     console.log(region.longitudeDelta);
 
     if(region.longitudeDelta > 0.03 && region.latitudeDelta > 0.03 ){
       console.log("should have done it");
-      return (
-        this.state.markers = []
-      );
+      //this.state.markers = [];
+      console.log("Updated");
+      if(this.state.dave){
+        console.log("whaa");
+      }
   }
 }
 
-  getCurrentPosition() {
+  getCurrentPosition(){
     try {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -104,7 +113,6 @@ export default class App extends React.Component {
           this.setRegion(region);
         },
         (error) => {
-          //TODO: better design
           console.log(error);
         }
       );
@@ -146,26 +154,6 @@ export default class App extends React.Component {
 
         </MapView>
         <View style={styles.camera}>
-          
-          {/* <Camera
-
-          ref={(cam) => {
-
-              this.camera = cam;
-
-            }}
-
-            style={styles.preview}
-
-            //aspect={Camera.constants.Aspect.fill}
-            >
-
-              <Text style={styles.capture} onPress={this.takePicture.bind(this)}>
-
-                  [CAPTURE]
-
-              </Text>
-          </Camera> */}
         </View>
       </View>
     );
