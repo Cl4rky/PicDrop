@@ -2,7 +2,17 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import MapView from 'react-native-maps';
 import { Marker } from 'react-native-maps';
+import * as firebase from "firebase";
 //import Camera from 'react-native-camera';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAaQnRN6FDgLJzdzRQTSybZLyqVsQ2TTNQ",
+  authDomain: "picdrop-4f5a3.firebaseapp.com",
+  databaseURL: "https://picdrop-4f5a3.firebaseio.com",
+  storageBucket: ""
+};
+const firebaseApp = firebase.initializeApp(firebaseConfig);
+
 
 const LATITUDE_DELTA = 0.01;
 const LONGITUDE_DELTA = 0.01;
@@ -31,6 +41,7 @@ export default class App extends React.Component {
 
   constructor(props) {
     super(props);
+    this.markersRef = firebaseApp.database().ref();
 
     this.state = {
       ready: true,
@@ -40,67 +51,64 @@ export default class App extends React.Component {
         latitudeDelta: 0.0922,
         longitudeDelta: 0.0421,
       },
-      dave: true,
-      markers: [
-        {
-        title: 'hello',
-        coordinates: {
-          latitude: 51.354837, 
-          longitude: -0.780931
-        },
-      },
-      {
-        title: 'hello2',
-        coordinates: {
-          latitude: 51.355329,
-          longitude: -0.777387
-        },  
-      }],
-    }
+      markers: [],
+    };
+      
   }
 
-  takePicture() { 
-     this.camera.capture()
+  takePicture() {
+       this.camera.capture()
     
-      .then((data) => console.log(data))
-      .catch(err => console.error(err));   
+          .then((data) => console.log(data))
+    
+          .catch(err => console.error(err));
+    
+  }
+
+  readUserData(markers) {
+    firebase.database().ref('/Markers').once('value', function (snapshot) {
+        // Push these into the marker array!! -- profit
+        snapshot.forEach((child) => {
+          console.log(child.val().Name);
+          markers.push({
+            title: child.val().Name,
+            coordinates:{
+              latitude: child.val().Lat,
+              longitude: child.val().Lng
+            }
+          });
+        })
+  })
+  console.log(markers);
   }
 
   setRegion(region){
     if(this.state.ready) {
       setTimeout(() => this.map.animateToRegion(region), 10);
-      console.log("err okay");
     }
+  }
+
+  componentWillMount(){
+    this.readUserData(this.state.markers);
+    console.log(this.state.markers);
   }
   
   componentDidMount(){
-    // this.setState({
-    //   markers : [{
-    //     coordinates: {
-    //           latitude: 51.354837, 
-    //           longitude: -0.780931
-    //         },
-    //       }],
-    // })
     this.getCurrentPosition();
   }
 
   onRegionChange(region){
-    console.log("Region Changed");
-    console.log(region.latitudeDelta);
-    console.log(region.longitudeDelta);
+    //console.log("Region Changed , updated");
+    //console.log(region.latitudeDelta);
+    //console.log(region.longitudeDelta);
 
     if(region.longitudeDelta > 0.03 && region.latitudeDelta > 0.03 ){
-      console.log("should have done it");
-      //this.state.markers = [];
-      console.log("Updated");
-      if(this.state.dave){
-        console.log("whaa");
-      }
+      //console.log("should have done it");
+      //this.state.markers=[]
   }
 }
 
-  getCurrentPosition(){
+  getCurrentPosition() {
     try {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -113,6 +121,7 @@ export default class App extends React.Component {
           this.setRegion(region);
         },
         (error) => {
+          //TODO: better design
           console.log(error);
         }
       );
@@ -154,6 +163,26 @@ export default class App extends React.Component {
 
         </MapView>
         <View style={styles.camera}>
+          
+          {/* <Camera
+
+          ref={(cam) => {
+
+              this.camera = cam;
+
+            }}
+
+            style={styles.preview}
+
+            //aspect={Camera.constants.Aspect.fill}
+            >
+
+              <Text style={styles.capture} onPress={this.takePicture.bind(this)}>
+
+                  [CAPTURE]
+
+              </Text>
+          </Camera> */}
         </View>
       </View>
     );
